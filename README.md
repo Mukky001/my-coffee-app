@@ -84,3 +84,21 @@ image small and production-ready.
 - Runs as a production Node.js server
 
 **Result:**
+
+---
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions to automatically build and push 
+the Docker image on every push to the `main` branch.
+
+**Pipeline steps:**
+1. Checkout code
+2. Log in to Docker Hub
+3. Build Docker image
+4. Push to Docker Hub
+
+**Workflow file:** `.github/workflows/docker.yml`
+
+**Latest image always available at:**
+docker pull mukky99/coffee-app:latest
