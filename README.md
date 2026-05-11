@@ -227,6 +227,7 @@ Back to 2/2 replicas — zero manual intervention ✅
 
 ## Project Structure
 
+```
 my-coffee-app/
 ├── .github/
 │   └── workflows/
@@ -252,6 +253,7 @@ my-coffee-app/
 - Original application developed by [siddami](https://github.com/siddami)
 - Built as part of a DevOps learning journey
 
+```
 ---
 
 ## License
