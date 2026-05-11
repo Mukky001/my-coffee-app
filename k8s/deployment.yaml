@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coffee-app
+  labels:
+    app: coffee-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: coffee-app
+  template:
+    metadata:
+      labels:
+        app: coffee-app
+    spec:
+      containers:
+      - name: coffee-app
+        image: mukky99/coffee-app:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
