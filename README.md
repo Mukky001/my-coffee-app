@@ -256,6 +256,78 @@ my-coffee-app/
 ```
 ---
 
+---
+
+## GitOps with ArgoCD
+
+This project uses ArgoCD to automatically sync Kubernetes deployments 
+from Git — any change pushed to the `k8s/` folder is automatically 
+applied to the cluster without manual kubectl commands.
+
+### How It Works
+
+```
+Push change to k8s/ folder
+↓
+ArgoCD detects change in GitHub (polls every 3 minutes)
+↓
+Automatically applies changes to Kubernetes cluster
+↓
+Cluster state matches Git state ✅
+
+```
+### ArgoCD Configuration
+
+**Application manifest:** `argocd-app.yaml`
+
+| Setting | Value |
+|---|---|
+| Watched repository | `https://github.com/Mukky001/my-coffee-app.git` |
+| Watched folder | `k8s/` |
+| Target cluster | Same cluster ArgoCD runs in |
+| Target namespace | `default` |
+| Sync mode | Automated |
+| Self-heal | Enabled — reverts manual cluster changes |
+| Prune | Enabled — removes deleted resources |
+
+### Installing ArgoCD
+
+```bash
+# Create namespace
+kubectl create namespace argocd
+
+# Install ArgoCD
+kubectl apply -n argocd --server-side --force-conflicts -f \
+https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# Wait for all Pods to be Running
+kubectl get pods -n argocd
+
+# Access the UI
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+Open `https://localhost:8080` in your browser.
+
+### Getting the Admin Password
+
+```bash
+kubectl get secret argocd-initial-admin-secret -n argocd \
+-o jsonpath="{.data.password}" | base64 -d
+```
+
+Login with username `admin` and the password from above.
+
+### Deploying the Application
+
+```bash
+kubectl apply -f argocd-app.yaml
+```
+
+ArgoCD will immediately sync and deploy all manifests from the `k8s/` folder.
+
+
+
 ## License
 
 MIT License
