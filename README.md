@@ -28,6 +28,9 @@ Kubernetes.
 | Kubernetes | Container orchestration |
 | Minikube | Local Kubernetes cluster |
 | NGINX Ingress | External traffic routing |
+| Helm | Kubernetes package manager |
+| Prometheus | Metrics collection |
+| Grafana | Monitoring dashboards |
 
 ---
 
@@ -326,6 +329,66 @@ kubectl apply -f argocd-app.yaml
 
 ArgoCD will immediately sync and deploy all manifests from the `k8s/` folder.
 
+---
+
+## Monitoring with Prometheus and Grafana
+
+Full observability stack installed via Helm, collecting metrics
+from every Pod and node in the cluster.
+
+### What is Monitored
+
+| Metric | What it shows |
+|---|---|
+| CPU Utilisation | Actual CPU being used across the cluster |
+| CPU Requests Commitment | How much CPU Pods have reserved |
+| CPU Limits Commitment | Maximum CPU Pods can consume |
+| Memory Utilisation | Actual RAM being used |
+| Memory Requests Commitment | How much RAM Pods have reserved |
+| Memory Limits Commitment | Maximum RAM Pods can consume |
+
+### Installing the Monitoring Stack
+
+```bash
+helm repo add prometheus-community \
+  https://prometheus-community.github.io/helm-charts
+
+helm repo update
+
+kubectl create namespace monitoring
+
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set grafana.adminPassword=admin123
+```
+
+### Accessing Grafana
+
+```bash
+kubectl port-forward -n monitoring svc/prometheus-grafana 3001:80
+```
+
+Open `http://localhost:3001` — username: `admin`, password: `admin123`
+
+### Key Dashboards
+
+| Dashboard | What it shows |
+|---|---|
+| Kubernetes / Compute Resources / Cluster | Full cluster CPU and memory overview |
+| Kubernetes / Compute Resources / Namespace | Per-namespace resource usage |
+| Kubernetes / Compute Resources / Pod | Per-pod CPU, memory, and throttling |
+| Kubernetes / Nodes | Node-level health and resources |
+
+### What the Metrics Mean
+
+```
+Utilisation  →  what is actually being used right now
+Requests     →  what Pods have formally reserved
+Limits       →  the maximum a Pod can ever consume
+
+CPU Throttling = No data → Pod never starved of CPU ✅
+Memory at requests line  → well calibrated resources ✅
+```
 
 
 ## License
